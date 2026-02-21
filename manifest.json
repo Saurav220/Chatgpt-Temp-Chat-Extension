@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "ChatGPT Temp Chat & Summarizer",
+  "version": "1.0",
+  "description": "Opens ChatGPT temporary chat. If text is selected, it automatically asks ChatGPT to summarize it.",
+  "permissions": ["activeTab", "scripting", "storage", "tabs"],
+  "host_permissions": ["https://chatgpt.com/*"],
+  "action": {
+    "default_title": "Open Temp Chat / Summarize Selection"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://chatgpt.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
