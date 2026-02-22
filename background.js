@@ -1,7 +1,13 @@
-chrome.action.onClicked.addListener(async (tab) => {
-  let contentToSummarize = "";
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "open_chat") {
+    handleOpenChat(request.isTemp, request.tab);
+  }
+});
 
-  if (tab.id && !tab.url.startsWith("chrome://")) {
+async function handleOpenChat(isTemp, tab) {
+  let contentToSummarize = "";
+  
+  if (tab && tab.id && tab.url && !tab.url.startsWith("chrome://")) {
     try {
       // Execute a script to get selected text or the full body text if nothing is selected
       const [{ result }] = await chrome.scripting.executeScript({
@@ -35,6 +41,19 @@ chrome.action.onClicked.addListener(async (tab) => {
     });
   }
 
-  // Open ChatGPT with temporary chat enabled
-  chrome.tabs.create({ url: "https://chatgpt.com/?temporary-chat=true" });
-});
+  const baseUrl = "https://chatgpt.com/";
+  const finalUrl = isTemp ? `${baseUrl}?temporary-chat=true` : baseUrl;
+
+  // Check if a chatgpt tab is already open
+  const existingTabs = await chrome.tabs.query({ url: "https://chatgpt.com/*" });
+  
+  if (existingTabs.length > 0) {
+    // Use the first existing chatgpt tab
+    const chatTab = existingTabs[0];
+    await chrome.tabs.update(chatTab.id, { url: finalUrl, active: true });
+    await chrome.windows.update(chatTab.windowId, { focused: true });
+  } else {
+    // Open ChatGPT in a new tab
+    chrome.tabs.create({ url: finalUrl });
+  }
+}

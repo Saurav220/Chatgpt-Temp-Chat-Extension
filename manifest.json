@@ -6,7 +6,8 @@
   "permissions": ["activeTab", "scripting", "storage", "tabs"],
   "host_permissions": ["https://chatgpt.com/*"],
   "action": {
-    "default_title": "Open Temp Chat / Summarize Selection"
+    "default_title": "Open Temp Chat / Summarize Selection",
+    "default_popup": "popup.html"
   },
   "background": {
     "service_worker": "background.js"
